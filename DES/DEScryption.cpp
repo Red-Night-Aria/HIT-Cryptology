@@ -11,6 +11,9 @@ void DEScryption::decrypt(istream &input, ostream &output, Mode mode) {
 }
 
 void DEScryption::encrypt(istream &input, ostream &output, Mode mode) {
+    /*
+    * 加密从流当前位置至流结尾的数据
+    * */
     cipher(input, output, mode, false);
 }
 
@@ -20,9 +23,10 @@ void DEScryption::cipher(istream &input, ostream &output, Mode mode, bool isDecr
 //    if (mode==Mode::ECB){
 //        DES des = DES(key);
 //    }
+    streamoff begin = input.tellg();
     input.seekg(0, input.end);
-    ui64 size = input.tellg();
-    input.seekg(0, input.beg);
+    ui64 size = input.tellg() - begin;
+    input.seekg(begin);
 
     ui64 block = size / 8;
     if(isDecrypt) block--;
