@@ -26,7 +26,7 @@ void DEScryption::cipher(istream &input, ostream &output, Mode mode, bool isDecr
     streamoff begin = input.tellg();
     input.seekg(0, input.end);
     ui64 size = input.tellg() - begin;
-    input.seekg(begin);
+    input.seekg(begin, input.beg);
 
     ui64 block = size / 8;
     if(isDecrypt) block--;

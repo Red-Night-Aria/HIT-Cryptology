@@ -1,44 +1,35 @@
 #include <iostream>
 #include "DEScryption.h"
-#include <sstream>
 #include <fstream>
-#include <unistd.h>
 
 int main() {
-//    char* buff;
-//    getcwd(buff, 0);
-//    if (buff==NULL){
-//        perror("getcwd error");
-//    }
-//    else {
-//        printf("%s", buff);
-//    }
-
-    string srecetKey = "Yezhonghao";
+    string srecetKey = "Redim";
     DEScryption fe(srecetKey);
-//    string plain_text = "Hello World";
-//    istringstream input(plain_text);
-//    ostringstream output;
-//    fe.encrypt(input, output);
-//    string cipher = output.str();
-//    cout << cipher << endl;
-//    istringstream another_input(cipher);
-//    ostringstream another_output;
-//    fe.decrypt(another_input, another_output);
-//    cout << another_output.str() << endl;
+    const string INPUT_PIC = "../test.bmp";
+    const string OUTPUT_PIC = "../encrypt.bmp";
+    ifstream pic(INPUT_PIC, ios::binary);
 
-    ifstream pic("../test.bmp", ios::binary);
+    /* read offset field */
     pic.seekg(10, pic.beg);
     ui32 offset = 0;
     pic.read((char *)&offset, 4);
+    cout << offset << endl;
     pic.seekg(0, pic.beg);
-    char bmp_head[1000];
-    pic.read(bmp_head, offset);
-    bmp_head[offset] = '\0';
 
-    ofstream enc_pic("../encrypt.bmp", ios::binary);
+    /* copy bmp file head data*/
+    const unsigned HEAD_MAX = 3000;
+    char bmp_head[HEAD_MAX];
+    pic.read(bmp_head, offset);
+    ofstream enc_pic(OUTPUT_PIC, ios::binary);
+    enc_pic.write(bmp_head, offset); //enc_pic << bmp_head; WRONG!
+
     fe.encrypt(pic, enc_pic);
     pic.close();
     enc_pic.close();
+
+//    pic.open("../encrypt.bmp", ios::binary);
+//    pic.seekg(10, pic.beg);
+//    pic.read((char *)&offset, 4);
+//    cout << offset << endl;
     return 0;
 }
