@@ -5,9 +5,11 @@
 #ifndef DES_BMPCRYPTION_H
 #define DES_BMPCRYPTION_H
 
-#include "des.h"
 #include <string>
 #include <iostream>
+using std::string;
+using std::istream;
+using std::ostream;
 
 enum class Mode{ECB, CBC};
 
@@ -17,9 +19,9 @@ public:
     void encrypt(istream& input, ostream& output, Mode mode=Mode::ECB);
     void decrypt(istream& input, ostream& output, Mode mode=Mode::ECB);
 private:
-    ui64 key = 0;
+    uint64_t key = 0;
     void cipher(istream& input, ostream& output, Mode mode, bool isDecrypt);
-    ui64 BKDRHash(const string &str);
+    uint64_t BKDRHash(const string &str);
 };
 
 

@@ -2,7 +2,10 @@
 // Created by redim on 18-3-17.
 //
 
+#include <memory>
 #include "DEScryption.h"
+#include "descbc.h"
+#include "des.h"
 
 using namespace std; //since des.h has already include std namespace, I have no choice ...
 
@@ -19,10 +22,8 @@ void DEScryption::encrypt(istream &input, ostream &output, Mode mode) {
 
 void DEScryption::cipher(istream &input, ostream &output, Mode mode, bool isDecrypt) {
     ui64 buffer;
-    DES des = DES(key);
-//    if (mode==Mode::ECB){
-//        DES des = DES(key);
-//    }
+    shared_ptr<DES> des = mode==Mode::ECB ? make_shared<DES>(key) : make_shared<DESCBC>(key);
+    //WRONG! DES des = mode==Mode::ECB ? DES(key) : DESCBC(key);
     streamoff begin = input.tellg();
     input.seekg(0, input.end);
     ui64 size = input.tellg() - begin;
@@ -35,9 +36,9 @@ void DEScryption::cipher(istream &input, ostream &output, Mode mode, bool isDecr
         input.read((char*) &buffer, 8);
 
         if(isDecrypt)
-            buffer = des.decrypt(buffer);
+            buffer = des->decrypt(buffer);
         else
-            buffer = des.encrypt(buffer);
+            buffer = des->encrypt(buffer);
 
         output.write((char*) &buffer, 8);
     }
@@ -60,13 +61,13 @@ void DEScryption::cipher(istream &input, ostream &output, Mode mode, bool isDecr
         buffer <<= shift;
         buffer  |= (ui64) 0x0000000000000001 << (shift - 1);
 
-        buffer = des.encrypt(buffer);
+        buffer = des->encrypt(buffer);
         output.write((char*) &buffer, 8);
     }
     else {
         // Read last line of file
         input.read((char*) &buffer, 8);
-        buffer = des.decrypt(buffer);
+        buffer = des->decrypt(buffer);
 
         // Amount of padding on file
         ui8 padding = 0;
@@ -91,9 +92,9 @@ DEScryption::DEScryption(const string &strkey) {
     //printf("%llx\n", key);
 }
 
-ui64 DEScryption::BKDRHash(const string &str) {
-    ui64 seed = 131;
-    ui64 hash = 0;
+uint64_t DEScryption::BKDRHash(const string &str) {
+    uint64_t seed = 131;
+    uint64_t hash = 0;
 
     auto it = str.cbegin();
     while (it != str.cend())

@@ -1,5 +1,6 @@
 *.exe
 *.o
-.vscode
+.vscode/
 cmake-build-debug
-.idea
+*.xml
+*.bmp
