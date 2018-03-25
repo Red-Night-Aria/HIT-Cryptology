@@ -1,7 +1,6 @@
 #include "des.h"
 #include "des_key.h"
 #include "des_data.h"
-#include "des_lookup.h"
 
 //#pragma GCC push_options
 #pragma GCC optimize ("unroll-loops")
@@ -82,6 +81,7 @@ ui64 DES::des(ui64 block, bool mode)
     {
         ui32 F = mode ? f(R, sub_key[15-i]) : f(R, sub_key[i]);
         feistel(L, R, F);
+        //printf("%llx\n", ((ui64)L<<32)|(ui64)R);
     }
 
     // swapping the two parts
