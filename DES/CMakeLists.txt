@@ -3,7 +3,9 @@ project(DES)
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(C:\\Code\\boost_1_66_0)
+include_directories(/usr/local/include)
+link_libraries(/usr/local/lib)
+
 add_executable(DES main.cpp
         des.cpp
         des.h
@@ -13,3 +15,6 @@ add_executable(DES main.cpp
         descbc.cpp
         descbc.h
         DEScryption.cpp DEScryption.h)
+
+target_link_libraries(DES boost_program_options)
+

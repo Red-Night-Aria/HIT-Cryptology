@@ -44,9 +44,11 @@ int main(int argc, char** argv) {
     string input, output;
     po::options_description desc("usage: ");
     desc.add_options()
-            ("help", "produce help message")
-            ("input", po::value<string>(&input), "input file")
-            ("output", po::value<string>(&output)->default_value("decrypt_result"));
+            ("help,H", "produce help message")
+            ("bmp,B", "whether input file is bmp syntax")
+            ("mode,M", po::value<string>()->default_value("ECB"), "encrypt mode, either ECB or CBC")
+            ("input,I", po::value<string>(&input), "input file")
+            ("output,O", po::value<string>(&output)->default_value("decrypt_result"));
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -57,34 +59,21 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    cout << input << " "+output << endl;
-//    const string INPUT_PIC = "../test.bmp";
-//    const string OUTPUT_PIC = "../encrypt_CBC.bmp";
-//
-//    encryptBMP(INPUT_PIC, OUTPUT_PIC, fe, Mode::CBC);
+    Mode mode=Mode::ECB;
+    if (vm["mode"].as<string>() == "CBC"){
+        mode = Mode::CBC;
+    }
 
-//    uint64_t origin_bytes = 0;
-//    array<int, 64> frequency = {};
-//
-//    random_device r;
-//    default_random_engine e1(r());
-//
-//    for (int i=0; i<256; i++){
-//        uint64_t transform_bytes = random_transform(origin_bytes, e1);
-//        uint64_t encrypyed_bytes = DES::encrypt(transform_bytes, fe.getKey());
-//        uint64_t mask = 1;
-//        for (int i=0; i<64; i++){
-//            if ((encrypyed_bytes & mask) != 0){
-//                ++frequency[i];
-//            }
-//            mask = mask << 1;
-//        }
-//    }
-//
-//    for (int i=0; i<64; i++){
-//        cout << "pos " << i << ": " << frequency[i] << endl;
-//    }
-
+    if (vm.count("bmp")){
+        encryptBMP(input, output, fe, mode);
+    }
+    else {
+        ifstream input_strm(input, ios::binary);
+        ofstream output_strm(output, ios::binary);
+        fe.encrypt(input_strm, output_strm, mode);
+        input_strm.close();
+        output_strm.close();
+    }
 
     return 0;
 }
